@@ -1,5 +1,4 @@
-const prisma = require("../lib/prisma");
-
+import prisma from "../lib/prisma.js";
 // Get complete itinerary for a trip
 const getItinerary = async (req, res, next) => {
   try {
@@ -406,7 +405,7 @@ const reorderStops = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
   getItinerary,
   addStop,
   updateStop,

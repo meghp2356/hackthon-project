@@ -1,14 +1,14 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   getItinerary,
   addStop,
   updateStop,
   deleteStop,
   reorderStops,
-} = require("../controller/itinerary.controller");
+} from "../controller/itinerary.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -27,4 +27,4 @@ router.delete("/:tripId/stops/:stopId", protect, deleteStop);
 // Reorder stops
 router.put("/:tripId/stops/reorder", protect, reorderStops);
 
-module.exports = router;
+export default router;

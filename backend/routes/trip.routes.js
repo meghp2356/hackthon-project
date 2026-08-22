@@ -1,14 +1,14 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   createTrip,
   getMyTrips,
   getTripById,
   updateTrip,
   deleteTrip,
-} = require("../controller/trip.controller");
+} from "../controller/trip.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -27,4 +27,4 @@ router.put("/:id", protect, updateTrip);
 // Delete trip
 router.delete("/:id", protect, deleteTrip);
 
-module.exports = router;
+export default router;

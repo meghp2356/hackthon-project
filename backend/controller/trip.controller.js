@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 // Create Trip
 const createTrip = async (req, res, next) => {
@@ -340,7 +340,7 @@ const deleteTrip = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   createTrip,
   getMyTrips,
   getTripById,
