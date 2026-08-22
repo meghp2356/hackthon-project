@@ -8,7 +8,7 @@ export class ApiClientError extends Error {
 
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_BASE_URL) throw new ApiClientError({ code: "API_NOT_CONFIGURED", message: "No API base URL has been configured." });
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers: { Accept: "application/json", ...init?.headers } });
+  const response = await fetch(`${API_BASE_URL}${path}`, { ...init, credentials: "include", headers: { Accept: "application/json", ...init?.headers } });
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null);
     const error = apiErrorSchema.safeParse(payload).success ? apiErrorSchema.parse(payload) : { code: "REQUEST_FAILED", message: "Something went wrong. Please try again." };

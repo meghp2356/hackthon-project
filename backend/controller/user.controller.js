@@ -1,5 +1,5 @@
-const bcrypt = require("bcryptjs");
-const prisma = require("../lib/prisma");
+import bcrypt from "bcryptjs";
+import prisma from "../lib/prisma.js";
 
 // Get current user profile
 const getProfile = async (req, res, next) => {
@@ -245,7 +245,7 @@ const deleteAccount = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
   getProfile,
   updateProfile,
   changePassword,

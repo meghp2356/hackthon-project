@@ -1,13 +1,13 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   getProfile,
   updateProfile,
   changePassword,
   deleteAccount,
-} = require("../controller/user.controller");
+} from "../controller/user.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -23,4 +23,4 @@ router.put("/password", protect, changePassword);
 // Delete account
 router.delete("/account", protect, deleteAccount);
 
-module.exports = router;
+export default router;

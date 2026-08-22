@@ -1,15 +1,15 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   getActivities,
   getActivityById,
   addActivityToTrip,
   getTripStopActivities,
   updateTripActivity,
   removeActivityFromTrip,
-} = require("../controller/activity.controller");
+} from "../controller/activity.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -47,4 +47,4 @@ router.delete(
 // Get one activity
 router.get("/:id", getActivityById);
 
-module.exports = router;
+export default router;

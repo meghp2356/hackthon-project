@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 // Get complete budget summary
 const getBudgetSummary = async (req, res, next) => {
@@ -393,7 +393,7 @@ const deleteExpense = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
   getBudgetSummary,
   addExpense,
   updateExpense,

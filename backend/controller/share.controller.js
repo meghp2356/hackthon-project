@@ -1,5 +1,5 @@
-const crypto = require("crypto");
-const prisma = require("../lib/prisma");
+import crypto from "crypto";
+import prisma from "../lib/prisma.js";
 
 // Create or regenerate a share link
 const createShareLink = async (req, res, next) => {
@@ -158,7 +158,7 @@ const disableShareLink = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
   createShareLink,
   getSharedTrip,
   disableShareLink,

@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 // Get/search activities
 const getActivities = async (req, res, next) => {
@@ -455,7 +455,7 @@ const removeActivityFromTrip = async (req, res, next) => {
 };
 
 
-module.exports = {
+export {
   getActivities,
   getActivityById,
   addActivityToTrip,
