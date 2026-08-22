@@ -1,13 +1,13 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   getBudgetSummary,
   addExpense,
   updateExpense,
   deleteExpense,
-} = require("../controller/budget.controller");
+} from "../controller/budget.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -39,4 +39,4 @@ router.delete(
   deleteExpense
 );
 
-module.exports = router;    
+export default router;

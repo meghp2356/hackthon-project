@@ -1,73 +1,33 @@
 import express from "express";
 
 import {
-  getProfile,
-  updateProfile,
-  checkEmailAvailability,
-  getUserStats,
-  getUserTrips,
-  getUserExpenseSummary,
-  changePassword,
-  deleteAccount,
-} from "../controller/user.controller.js";
+  createShareLink,
+  getSharedTrip,
+  disableShareLink,
+} from "../controller/share.controller.js";
 
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// Check email availability
+// Create/regenerate share link
+router.post(
+  "/trips/:tripId",
+  protect,
+  createShareLink
+);
+
+// Public shared trip
 router.get(
-  "/check-email",
-  checkEmailAvailability
+  "/:token",
+  getSharedTrip
 );
 
-// Get profile
-router.get(
-  "/profile",
-  protect,
-  getProfile
-);
-
-// Update profile
-router.put(
-  "/profile",
-  protect,
-  updateProfile
-);
-
-// User statistics
-router.get(
-  "/stats",
-  protect,
-  getUserStats
-);
-
-// User trips
-router.get(
-  "/trips",
-  protect,
-  getUserTrips
-);
-
-// User expense summary
-router.get(
-  "/expenses/summary",
-  protect,
-  getUserExpenseSummary
-);
-
-// Change password
-router.put(
-  "/password",
-  protect,
-  changePassword
-);
-
-// Delete account
+// Disable share link
 router.delete(
-  "/account",
+  "/trips/:tripId",
   protect,
-  deleteAccount
+  disableShareLink
 );
 
 export default router;
