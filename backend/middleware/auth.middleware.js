@@ -1,6 +1,6 @@
-import { verifyAccessToken } from "../utils/jwt.js";
+const { verifyAccessToken } = require("../utils/jwt");
 
-export const protect = (req, res, next) => {
+const protect = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -26,4 +26,8 @@ export const protect = (req, res, next) => {
       message: "Invalid or expired token",
     });
   }
+};
+
+module.exports = {
+  protect,
 };

@@ -1,6 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-
-const prisma = new PrismaClient();
+const prisma = require("../lib/prisma");
 
 const quickActions = [
   {
@@ -112,6 +110,7 @@ const getDashboard = async (req, res, next) => {
     const spentBudget = formatMoney(budgetTotals._sum.spentBudget);
 
     res.status(200).json({
+      success: true,
       message: `Welcome${user?.name ? `, ${user.name}` : ""}!`,
       user,
       recentTrips,

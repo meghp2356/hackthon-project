@@ -1,14 +1,14 @@
-import bcrypt from "bcryptjs";
+const bcrypt = require("bcrypt");
 
-import prisma from "../lib/prisma.js";
+const prisma = require("../lib/prisma");
 
-import {
+const {
   generateAccessToken,
   generateResetToken,
   verifyResetToken,
-} from "../utils/jwt.js";
+} = require("../utils/jwt");
 
-export const signup = async (req, res) => {
+const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -75,7 +75,7 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -137,7 +137,7 @@ export const login = async (req, res) => {
   }
 };
 
-export const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -166,6 +166,17 @@ export const forgotPassword = async (req, res) => {
     }
 
     const resetToken = generateResetToken(user.id);
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
+    });
 
     // In a real application, send this token/link through email.
     const resetLink =
@@ -188,7 +199,7 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-export const resetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
 
@@ -237,6 +248,17 @@ export const resetPassword = async (req, res) => {
       });
     }
 
+    if (
+      user.resetToken !== token ||
+      !user.resetTokenExpiry ||
+      user.resetTokenExpiry < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
     const passwordHash = await bcrypt.hash(password, 12);
 
     await prisma.user.update({
@@ -245,6 +267,8 @@ export const resetPassword = async (req, res) => {
       },
       data: {
         passwordHash,
+        resetToken: null,
+        resetTokenExpiry: null,
       },
     });
 
@@ -260,4 +284,11 @@ export const resetPassword = async (req, res) => {
       message: "Something went wrong",
     });
   }
+};
+
+module.exports = {
+  signup,
+  login,
+  forgotPassword,
+  resetPassword,
 };

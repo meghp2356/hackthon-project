@@ -1,40 +1,49 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const getJwtSecret = () => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined");
-}
+  return process.env.JWT_SECRET;
+};
 
-export const generateAccessToken = (userId) => {
+const generateAccessToken = (userId) => {
   return jwt.sign(
     {
       userId,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: "7d",
     }
   );
 };
 
-export const verifyAccessToken = (token) => {
-  return jwt.verify(token, JWT_SECRET);
+const verifyAccessToken = (token) => {
+  return jwt.verify(token, getJwtSecret());
 };
 
-export const generateResetToken = (userId) => {
+const generateResetToken = (userId) => {
   return jwt.sign(
     {
       userId,
       type: "password-reset",
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: "15m",
     }
   );
 };
 
-export const verifyResetToken = (token) => {
-  return jwt.verify(token, JWT_SECRET);
+const verifyResetToken = (token) => {
+  return jwt.verify(token, getJwtSecret());
+};
+
+module.exports = {
+  generateAccessToken,
+  verifyAccessToken,
+  generateResetToken,
+  verifyResetToken,
 };
