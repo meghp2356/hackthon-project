@@ -5,7 +5,11 @@ const {
   login,
   forgotPassword,
   resetPassword,
+<<<<<<< HEAD
 } = require("../controller/auth.controller");
+=======
+} from "../controller/auth.controller.js";
+>>>>>>> b95f660 (auth comepleeeeeeee)
 
 const router = express.Router();
 
