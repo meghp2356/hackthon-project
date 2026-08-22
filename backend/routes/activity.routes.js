@@ -1,20 +1,23 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   getActivities,
   getActivityById,
   addActivityToTrip,
   getTripStopActivities,
   updateTripActivity,
   removeActivityFromTrip,
-} = require("../controller/activity.controller");
+} from "../controller/activity.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 // Search / filter activities
-router.get("/", getActivities);
+router.get(
+  "/",
+  getActivities
+);
 
 // Add activity to itinerary stop
 router.post(
@@ -45,6 +48,9 @@ router.delete(
 );
 
 // Get one activity
-router.get("/:id", getActivityById);
+router.get(
+  "/:id",
+  getActivityById
+);
 
-module.exports = router;
+export default router;

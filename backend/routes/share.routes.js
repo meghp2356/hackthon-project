@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   createShareLink,
   getSharedTrip,
   disableShareLink,
-} = require("../controller/share.controller");
+} from "../controller/share.controller.js";
 
-const { protect } = require("../middleware/auth.middleware");
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -30,4 +30,4 @@ router.delete(
   disableShareLink
 );
 
-module.exports = router;
+export default router;

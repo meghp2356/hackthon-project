@@ -1,5 +1,5 @@
-const crypto = require("crypto");
-const prisma = require("../lib/prisma");
+import crypto from "crypto";
+import prisma from "../lib/prisma.js";
 
 // Create or regenerate a share link
 const createShareLink = async (req, res, next) => {
@@ -28,7 +28,9 @@ const createShareLink = async (req, res, next) => {
       });
     }
 
-    const shareToken = crypto.randomBytes(32).toString("hex");
+    const shareToken = crypto
+      .randomBytes(32)
+      .toString("hex");
 
     await prisma.trip.update({
       where: {
@@ -50,9 +52,12 @@ const createShareLink = async (req, res, next) => {
   }
 };
 
-
 // Get shared trip
-const getSharedTrip = async (req, res, next) => {
+const getSharedTrip = async (
+  req,
+  res,
+  next
+) => {
   try {
     const { token } = req.params;
 
@@ -76,6 +81,7 @@ const getSharedTrip = async (req, res, next) => {
           orderBy: {
             stopOrder: "asc",
           },
+
           select: {
             id: true,
             city: true,
@@ -98,7 +104,8 @@ const getSharedTrip = async (req, res, next) => {
     if (!trip) {
       return res.status(404).json({
         success: false,
-        message: "Shared trip not found or link is invalid",
+        message:
+          "Shared trip not found or link is invalid",
       });
     }
 
@@ -111,9 +118,12 @@ const getSharedTrip = async (req, res, next) => {
   }
 };
 
-
 // Disable sharing
-const disableShareLink = async (req, res, next) => {
+const disableShareLink = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { tripId } = req.params;
@@ -157,8 +167,7 @@ const disableShareLink = async (req, res, next) => {
   }
 };
 
-
-module.exports = {
+export {
   createShareLink,
   getSharedTrip,
   disableShareLink,

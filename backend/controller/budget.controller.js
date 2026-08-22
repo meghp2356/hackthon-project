@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 // Get complete budget summary
 const getBudgetSummary = async (req, res, next) => {
@@ -37,13 +37,17 @@ const getBudgetSummary = async (req, res, next) => {
     });
 
     const totalSpent = expenses.reduce(
-      (total, expense) => total + Number(expense.amount),
+      (total, expense) =>
+        total + Number(expense.amount),
       0
     );
 
-    const plannedBudget = Number(trip.plannedBudget);
+    const plannedBudget = Number(
+      trip.plannedBudget
+    );
 
-    const remainingBudget = plannedBudget - totalSpent;
+    const remainingBudget =
+      plannedBudget - totalSpent;
 
     // Category breakdown
     const categoryBreakdown = {};
@@ -55,28 +59,27 @@ const getBudgetSummary = async (req, res, next) => {
         categoryBreakdown[category] = 0;
       }
 
-      categoryBreakdown[category] += Number(expense.amount);
+      categoryBreakdown[category] += Number(
+        expense.amount
+      );
     });
 
     return res.status(200).json({
       success: true,
-
       budget: {
         plannedBudget,
         totalSpent,
         remainingBudget,
-        isOverBudget: totalSpent > plannedBudget,
+        isOverBudget:
+          totalSpent > plannedBudget,
       },
-
       categoryBreakdown,
-
       expenses,
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 // Add expense
 const addExpense = async (req, res, next) => {
@@ -99,10 +102,15 @@ const addExpense = async (req, res, next) => {
       });
     }
 
-    if (!title || !category || amount === undefined) {
+    if (
+      !title ||
+      !category ||
+      amount === undefined
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Title, category and amount are required",
+        message:
+          "Title, category and amount are required",
       });
     }
 
@@ -167,27 +175,30 @@ const addExpense = async (req, res, next) => {
         title: title.trim(),
         category,
         amount: expenseAmount,
-        description: description?.trim() || null,
+        description:
+          description?.trim() || null,
         expenseDate: parsedDate,
       },
     });
 
     // Update spent budget
-    const totalSpent = await prisma.expense.aggregate({
-      where: {
-        tripId,
-      },
-      _sum: {
-        amount: true,
-      },
-    });
+    const totalSpent =
+      await prisma.expense.aggregate({
+        where: {
+          tripId,
+        },
+        _sum: {
+          amount: true,
+        },
+      });
 
     await prisma.trip.update({
       where: {
         id: tripId,
       },
       data: {
-        spentBudget: totalSpent._sum.amount || 0,
+        spentBudget:
+          totalSpent._sum.amount || 0,
       },
     });
 
@@ -201,21 +212,25 @@ const addExpense = async (req, res, next) => {
   }
 };
 
-
 // Update expense
-const updateExpense = async (req, res, next) => {
+const updateExpense = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { expenseId } = req.params;
 
-    const existingExpense = await prisma.expense.findFirst({
-      where: {
-        id: expenseId,
-        trip: {
-          userId,
+    const existingExpense =
+      await prisma.expense.findFirst({
+        where: {
+          id: expenseId,
+          trip: {
+            userId,
+          },
         },
-      },
-    });
+      });
 
     if (!existingExpense) {
       return res.status(404).json({
@@ -274,7 +289,8 @@ const updateExpense = async (req, res, next) => {
       ) {
         return res.status(400).json({
           success: false,
-          message: "Amount must be greater than 0",
+          message:
+            "Amount must be greater than 0",
         });
       }
 
@@ -307,21 +323,23 @@ const updateExpense = async (req, res, next) => {
     });
 
     // Recalculate spent budget
-    const totalSpent = await prisma.expense.aggregate({
-      where: {
-        tripId: existingExpense.tripId,
-      },
-      _sum: {
-        amount: true,
-      },
-    });
+    const totalSpent =
+      await prisma.expense.aggregate({
+        where: {
+          tripId: existingExpense.tripId,
+        },
+        _sum: {
+          amount: true,
+        },
+      });
 
     await prisma.trip.update({
       where: {
         id: existingExpense.tripId,
       },
       data: {
-        spentBudget: totalSpent._sum.amount || 0,
+        spentBudget:
+          totalSpent._sum.amount || 0,
       },
     });
 
@@ -335,21 +353,25 @@ const updateExpense = async (req, res, next) => {
   }
 };
 
-
 // Delete expense
-const deleteExpense = async (req, res, next) => {
+const deleteExpense = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { expenseId } = req.params;
 
-    const existingExpense = await prisma.expense.findFirst({
-      where: {
-        id: expenseId,
-        trip: {
-          userId,
+    const existingExpense =
+      await prisma.expense.findFirst({
+        where: {
+          id: expenseId,
+          trip: {
+            userId,
+          },
         },
-      },
-    });
+      });
 
     if (!existingExpense) {
       return res.status(404).json({
@@ -365,21 +387,23 @@ const deleteExpense = async (req, res, next) => {
     });
 
     // Recalculate spent budget
-    const totalSpent = await prisma.expense.aggregate({
-      where: {
-        tripId: existingExpense.tripId,
-      },
-      _sum: {
-        amount: true,
-      },
-    });
+    const totalSpent =
+      await prisma.expense.aggregate({
+        where: {
+          tripId: existingExpense.tripId,
+        },
+        _sum: {
+          amount: true,
+        },
+      });
 
     await prisma.trip.update({
       where: {
         id: existingExpense.tripId,
       },
       data: {
-        spentBudget: totalSpent._sum.amount || 0,
+        spentBudget:
+          totalSpent._sum.amount || 0,
       },
     });
 
@@ -392,8 +416,7 @@ const deleteExpense = async (req, res, next) => {
   }
 };
 
-
-module.exports = {
+export {
   getBudgetSummary,
   addExpense,
   updateExpense,
