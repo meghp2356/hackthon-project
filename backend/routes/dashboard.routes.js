@@ -1,10 +1,11 @@
-const express = require("express");
+import express from "express";
 
-const { getDashboard } = require("../controller/dashboard.controller");
-const { protect } = require("../middleware/auth.middleware");
+import { getDashboard } from "../controller/dashboard.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/", protect, getDashboard);
 
-module.exports = router;
+export default router;
+

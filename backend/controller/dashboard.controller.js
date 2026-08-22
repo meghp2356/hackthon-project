@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 const quickActions = [
   {
@@ -64,47 +64,54 @@ const getDashboard = async (req, res, next) => {
 
     const tripWhere = userId ? { userId } : {};
 
-    const [recentTrips, upcomingTrips, recommendedDestinations, budgetTotals] =
-      await Promise.all([
-        prisma.trip.findMany({
-          where: tripWhere,
-          orderBy: { createdAt: "desc" },
-          take: 5,
-          select: tripSelect,
-        }),
-        prisma.trip.findMany({
-          where: {
-            ...tripWhere,
-            startDate: {
-              gte: today,
-            },
-            status: "PLANNED",
+    const [
+      recentTrips,
+      upcomingTrips,
+      recommendedDestinations,
+      budgetTotals,
+    ] = await Promise.all([
+      prisma.trip.findMany({
+        where: tripWhere,
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: tripSelect,
+      }),
+
+      prisma.trip.findMany({
+        where: {
+          ...tripWhere,
+          startDate: {
+            gte: today,
           },
-          orderBy: { startDate: "asc" },
-          take: 5,
-          select: tripSelect,
-        }),
-        prisma.destination.findMany({
-          where: { isPopular: true },
-          orderBy: { city: "asc" },
-          take: 6,
-          select: destinationSelect,
-        }),
-        userId
-          ? prisma.trip.aggregate({
-              where: tripWhere,
-              _sum: {
-                plannedBudget: true,
-                spentBudget: true,
-              },
-            })
-          : Promise.resolve({
-              _sum: {
-                plannedBudget: 0,
-                spentBudget: 0,
-              },
-            }),
-      ]);
+          status: "PLANNED",
+        },
+        orderBy: { startDate: "asc" },
+        take: 5,
+        select: tripSelect,
+      }),
+
+      prisma.destination.findMany({
+        where: { isPopular: true },
+        orderBy: { city: "asc" },
+        take: 6,
+        select: destinationSelect,
+      }),
+
+      userId
+        ? prisma.trip.aggregate({
+            where: tripWhere,
+            _sum: {
+              plannedBudget: true,
+              spentBudget: true,
+            },
+          })
+        : Promise.resolve({
+            _sum: {
+              plannedBudget: 0,
+              spentBudget: 0,
+            },
+          }),
+    ]);
 
     const plannedBudget = formatMoney(budgetTotals._sum.plannedBudget);
     const spentBudget = formatMoney(budgetTotals._sum.spentBudget);
@@ -129,6 +136,6 @@ const getDashboard = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getDashboard,
 };

@@ -1,12 +1,19 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
-const {
+import {
   generateAccessToken,
   generateResetToken,
   verifyResetToken,
-} = require("../utils/jwt");
+} from "../utils/jwt.js";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 const signup = async (req, res) => {
   try {
@@ -53,12 +60,11 @@ const signup = async (req, res) => {
 
     const token = generateAccessToken(user.id);
 
+    res.cookie("accessToken", token, cookieOptions);
+
     return res.status(201).json({
       success: true,
       message: "Account created successfully",
-
-      token,
-
       user: {
         id: user.id,
         name: user.name,
@@ -115,12 +121,11 @@ const login = async (req, res) => {
 
     const token = generateAccessToken(user.id);
 
+    res.cookie("accessToken", token, cookieOptions);
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
-
-      token,
-
       user: {
         id: user.id,
         name: user.name,
@@ -166,7 +171,10 @@ const forgotPassword = async (req, res) => {
     }
 
     const resetToken = generateResetToken(user.id);
-    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+    const resetTokenExpiry = new Date(
+      Date.now() + 15 * 60 * 1000
+    );
 
     await prisma.user.update({
       where: {
@@ -178,9 +186,7 @@ const forgotPassword = async (req, res) => {
       },
     });
 
-    // In a real application, send this token/link through email.
-    const resetLink =
-      `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     console.log("PASSWORD RESET LINK:", resetLink);
 
@@ -286,9 +292,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = {
+const logout = (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
+
+export {
   signup,
   login,
   forgotPassword,
   resetPassword,
+  logout,
 };

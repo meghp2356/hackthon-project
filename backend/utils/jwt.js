@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const getJwtSecret = () => {
   if (!process.env.JWT_SECRET) {
@@ -41,7 +41,7 @@ const verifyResetToken = (token) => {
   return jwt.verify(token, getJwtSecret());
 };
 
-module.exports = {
+export {
   generateAccessToken,
   verifyAccessToken,
   generateResetToken,
