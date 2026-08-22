@@ -14,7 +14,11 @@ const getActivities = async (req, res, next) => {
       limit = 20,
     } = req.query;
 
-    const pageNumber = Math.max(parseInt(page) || 1, 1);
+    const pageNumber = Math.max(
+      parseInt(page) || 1,
+      1
+    );
+
     const limitNumber = Math.min(
       Math.max(parseInt(limit) || 20, 1),
       100
@@ -113,7 +117,9 @@ const getActivities = async (req, res, next) => {
       count: activities.length,
       total,
       page: pageNumber,
-      totalPages: Math.ceil(total / limitNumber),
+      totalPages: Math.ceil(
+        total / limitNumber
+      ),
       activities,
     });
   } catch (error) {
@@ -121,9 +127,12 @@ const getActivities = async (req, res, next) => {
   }
 };
 
-
 // Get activity by ID
-const getActivityById = async (req, res, next) => {
+const getActivityById = async (
+  req,
+  res,
+  next
+) => {
   try {
     const { id } = req.params;
 
@@ -152,9 +161,12 @@ const getActivityById = async (req, res, next) => {
   }
 };
 
-
 // Add activity to itinerary
-const addActivityToTrip = async (req, res, next) => {
+const addActivityToTrip = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { tripStopId } = req.params;
@@ -213,26 +225,33 @@ const addActivityToTrip = async (req, res, next) => {
     }
 
     // Prevent duplicate activity
-    const existing = await prisma.tripActivity.findUnique({
-      where: {
-        tripStopId_activityId: {
-          tripStopId,
-          activityId,
+    const existing =
+      await prisma.tripActivity.findUnique({
+        where: {
+          tripStopId_activityId: {
+            tripStopId,
+            activityId,
+          },
         },
-      },
-    });
+      });
 
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: "Activity is already added to this stop",
+        message:
+          "Activity is already added to this stop",
       });
     }
 
     const activityCost =
-      cost !== undefined ? Number(cost) : Number(activity.cost);
+      cost !== undefined
+        ? Number(cost)
+        : Number(activity.cost);
 
-    if (Number.isNaN(activityCost) || activityCost < 0) {
+    if (
+      Number.isNaN(activityCost) ||
+      activityCost < 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid activity cost",
@@ -244,7 +263,11 @@ const addActivityToTrip = async (req, res, next) => {
     if (activityDate) {
       parsedActivityDate = new Date(activityDate);
 
-      if (Number.isNaN(parsedActivityDate.getTime())) {
+      if (
+        Number.isNaN(
+          parsedActivityDate.getTime()
+        )
+      ) {
         return res.status(400).json({
           success: false,
           message: "Invalid activity date",
@@ -252,20 +275,21 @@ const addActivityToTrip = async (req, res, next) => {
       }
     }
 
-    const tripActivity = await prisma.tripActivity.create({
-      data: {
-        tripStopId,
-        activityId,
-        activityDate: parsedActivityDate,
-        startTime: startTime || null,
-        cost: activityCost,
-        notes: notes?.trim() || null,
-      },
-      include: {
-        activity: true,
-        tripStop: true,
-      },
-    });
+    const tripActivity =
+      await prisma.tripActivity.create({
+        data: {
+          tripStopId,
+          activityId,
+          activityDate: parsedActivityDate,
+          startTime: startTime || null,
+          cost: activityCost,
+          notes: notes?.trim() || null,
+        },
+        include: {
+          activity: true,
+          tripStop: true,
+        },
+      });
 
     return res.status(201).json({
       success: true,
@@ -277,9 +301,12 @@ const addActivityToTrip = async (req, res, next) => {
   }
 };
 
-
 // Get activities for a trip stop
-const getTripStopActivities = async (req, res, next) => {
+const getTripStopActivities = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { tripStopId } = req.params;
@@ -300,17 +327,18 @@ const getTripStopActivities = async (req, res, next) => {
       });
     }
 
-    const activities = await prisma.tripActivity.findMany({
-      where: {
-        tripStopId,
-      },
-      include: {
-        activity: true,
-      },
-      orderBy: {
-        activityDate: "asc",
-      },
-    });
+    const activities =
+      await prisma.tripActivity.findMany({
+        where: {
+          tripStopId,
+        },
+        include: {
+          activity: true,
+        },
+        orderBy: {
+          activityDate: "asc",
+        },
+      });
 
     return res.status(200).json({
       success: true,
@@ -322,23 +350,27 @@ const getTripStopActivities = async (req, res, next) => {
   }
 };
 
-
 // Update activity in itinerary
-const updateTripActivity = async (req, res, next) => {
+const updateTripActivity = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { tripActivityId } = req.params;
 
-    const existing = await prisma.tripActivity.findFirst({
-      where: {
-        id: tripActivityId,
-        tripStop: {
-          trip: {
-            userId,
+    const existing =
+      await prisma.tripActivity.findFirst({
+        where: {
+          id: tripActivityId,
+          tripStop: {
+            trip: {
+              userId,
+            },
           },
         },
-      },
-    });
+      });
 
     if (!existing) {
       return res.status(404).json({
@@ -357,7 +389,10 @@ const updateTripActivity = async (req, res, next) => {
     const data = {};
 
     if (activityDate !== undefined) {
-      if (activityDate === null || activityDate === "") {
+      if (
+        activityDate === null ||
+        activityDate === ""
+      ) {
         data.activityDate = null;
       } else {
         const date = new Date(activityDate);
@@ -380,7 +415,10 @@ const updateTripActivity = async (req, res, next) => {
     if (cost !== undefined) {
       const activityCost = Number(cost);
 
-      if (Number.isNaN(activityCost) || activityCost < 0) {
+      if (
+        Number.isNaN(activityCost) ||
+        activityCost < 0
+      ) {
         return res.status(400).json({
           success: false,
           message: "Invalid activity cost",
@@ -394,19 +432,21 @@ const updateTripActivity = async (req, res, next) => {
       data.notes = notes?.trim() || null;
     }
 
-    const updated = await prisma.tripActivity.update({
-      where: {
-        id: tripActivityId,
-      },
-      data,
-      include: {
-        activity: true,
-      },
-    });
+    const updated =
+      await prisma.tripActivity.update({
+        where: {
+          id: tripActivityId,
+        },
+        data,
+        include: {
+          activity: true,
+        },
+      });
 
     return res.status(200).json({
       success: true,
-      message: "Trip activity updated successfully",
+      message:
+        "Trip activity updated successfully",
       tripActivity: updated,
     });
   } catch (error) {
@@ -414,23 +454,27 @@ const updateTripActivity = async (req, res, next) => {
   }
 };
 
-
 // Remove activity from itinerary
-const removeActivityFromTrip = async (req, res, next) => {
+const removeActivityFromTrip = async (
+  req,
+  res,
+  next
+) => {
   try {
     const userId = req.user?.id;
     const { tripActivityId } = req.params;
 
-    const existing = await prisma.tripActivity.findFirst({
-      where: {
-        id: tripActivityId,
-        tripStop: {
-          trip: {
-            userId,
+    const existing =
+      await prisma.tripActivity.findFirst({
+        where: {
+          id: tripActivityId,
+          tripStop: {
+            trip: {
+              userId,
+            },
           },
         },
-      },
-    });
+      });
 
     if (!existing) {
       return res.status(404).json({
@@ -447,13 +491,13 @@ const removeActivityFromTrip = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Activity removed from itinerary",
+      message:
+        "Activity removed from itinerary",
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 export {
   getActivities,
