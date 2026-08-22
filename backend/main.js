@@ -7,6 +7,10 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const itineraryRoutes = require("./routes/itinerary.routes");
 const cityRoutes = require("./routes/city.routes");
+const activityRoutes = require("./routes/activity.routes");
+const budgetRoutes = require("./routes/budget.routes");
+const userRoutes = require("./routes/user.routes"); 
+const shareRoutes = require("./routes/share.routes");
 
 =======
 >>>>>>> Stashed changes
@@ -34,6 +38,10 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use("/api/cities", cityRoutes);
+app.use("/api/activities", activityRoutes);
+app.use("/api/budget", budgetRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/share", shareRoutes);
 
 // Root
 app.get("/", (req, res) => {

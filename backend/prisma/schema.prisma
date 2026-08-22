@@ -20,29 +20,32 @@ model User {
 }
 
 model Trip {
-  id                  String     @id @default(uuid())
-  title               String
-  description         String?
-  coverPhoto          String?
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  coverPhoto  String?
 
-  destinationCity     String
-  destinationCountry  String?
+  destinationCity    String
+  destinationCountry String?
 
-  startDate           DateTime
-  endDate             DateTime
+  startDate DateTime
+  endDate   DateTime
 
-  plannedBudget       Decimal    @default(0) @db.Decimal(10, 2)
-  spentBudget         Decimal    @default(0) @db.Decimal(10, 2)
+  plannedBudget Decimal @default(0) @db.Decimal(10, 2)
+  spentBudget   Decimal @default(0) @db.Decimal(10, 2)
 
-  status              TripStatus @default(PLANNED)
+  status TripStatus @default(PLANNED)
 
-  userId              String
-  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stops              TripStop[]
+  stops    TripStop[]
+  expenses Expense[]
 
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  shareToken String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([startDate])
@@ -50,36 +53,62 @@ model Trip {
 }
 
 model TripStop {
-  id          String   @id @default(cuid())
-  tripId      String
+  id     String @id @default(cuid())
+  tripId String
 
-  city        String
-  country     String   @default("India")
-  startDate   DateTime
-  endDate     DateTime
+  city      String
+  country   String   @default("India")
+  startDate DateTime
+  endDate   DateTime
 
-  stopOrder   Int      @default(0)
-  notes       String?
+  stopOrder Int     @default(0)
+  notes     String?
 
-  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  activities TripActivity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([tripId])
   @@index([tripId, stopOrder])
 }
 
+model Expense {
+  id String @id @default(cuid())
+
+  tripId String
+
+  title       String
+  category    ExpenseCategory
+  amount      Decimal         @db.Decimal(10, 2)
+  description String?
+  expenseDate DateTime        @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tripId])
+  @@index([category])
+  @@index([expenseDate])
+}
+
 model Destination {
-  id            String   @id @default(cuid())
+  id            String  @id @default(cuid())
   city          String
-  country       String   @default("India")
+  country       String  @default("India")
   description   String?
-  averageBudget Decimal  @default(0) @db.Decimal(10, 2)
+  averageBudget Decimal @default(0) @db.Decimal(10, 2)
   imageUrl      String?
-  isPopular     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  isPopular     Boolean @default(false)
+
+  activities Activity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([city, country])
   @@index([isPopular])
@@ -90,4 +119,60 @@ enum TripStatus {
   ONGOING
   COMPLETED
   CANCELLED
+}
+
+model Activity {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+
+  type            String
+  cost            Decimal @default(0) @db.Decimal(10, 2)
+  durationMinutes Int?
+
+  imageUrl String?
+
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  tripActivities TripActivity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([destinationId])
+  @@index([type])
+  @@index([cost])
+}
+
+model TripActivity {
+  id String @id @default(cuid())
+
+  tripStopId String
+  activityId String
+
+  activityDate DateTime?
+  startTime    String?
+  cost         Decimal   @default(0) @db.Decimal(10, 2)
+  notes        String?
+
+  tripStop TripStop @relation(fields: [tripStopId], references: [id], onDelete: Cascade)
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tripStopId, activityId])
+  @@index([tripStopId])
+  @@index([activityId])
+}
+
+enum ExpenseCategory {
+  ACCOMMODATION
+  TRANSPORT
+  FOOD
+  ACTIVITIES
+  SHOPPING
+  OTHER
 }
