@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const itineraryRoutes = require("./routes/itinerary.routes");
+const cityRoutes = require("./routes/city.routes");
 
 import "dotenv/config";
 import express from "express";
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/itinerary", itineraryRoutes);
+app.use("/api/cities", cityRoutes);
 
 app.get("/", (req, res) => {
   res.json({
